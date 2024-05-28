@@ -1,6 +1,6 @@
 function F = Interaction_robot_predateur(I,X,Xpred,Size,SizePred,Npred)
-A=1000;
-B=0.5;
+A=50000;
+B=2;
 
 F=[0;0];
 

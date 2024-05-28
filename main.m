@@ -8,12 +8,13 @@ N = 30;
 n = 10;
 
 Vrobot=10;
+Vpred=3;
 
 % Définition de l ile
 
 R_ile = 200;
 Center_ile = [250; 250];
-R_spawn = R_ile -1;
+R_spawn = R_ile -10;
 R_pred = 50;
 theta_pred = linspace(0, 7*pi/4, n);
 theta = linspace(0, 2*pi, 1000);
@@ -93,7 +94,7 @@ RDisques=[R_ile,3,3,3,3,3,3,3];
 
 % Définition du domaine temporel
 
-Tfinal = 100;
+Tfinal = 300;
 dt = 0.05;
 
 % Vitesses
@@ -105,7 +106,8 @@ Vexpecrouge=zeros(2,N); %vitesses désirées au temps tn
 Vnjaune=zeros(2,N); %vitesses au temps tn
 Vn1jaune=zeros(2,N); %vitesses au temps tn+1
 Vexpecjaune=zeros(2,N); %vitesses désirées au temps tn
-Vnjaune=-200*rand(2,N);
+
+Vnjaune=(-1)*randi([1,250],2,N);
 
 Vnpred=zeros(2,n); %vitesses au temps tn
 Vn1pred=zeros(2,n); %vitesses au temps tn+1
@@ -152,7 +154,7 @@ t=0;
 cont=1;
 
 %% Boucle en temps %%%%%%%%%%%%%%%
-while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
+while (t<Tfinal && condition_arret(Xfin, Xnjaune, Xnrouge, N)==0)
     
     % Calcul du centre de masse
     Gjaune=sum(Xnjaune')'/N; 
@@ -215,9 +217,21 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
         %Calcul source/plus proche proie
         source=[];
         minDist=Inf;
+
         for j=1:N
-            if norm(Xnpred(:,i)-Xnjaune(:))
-        %Vexpecpred(:,i)=Vexpected_robots(i,Xnpred,Vnpred,source,Vrobot);
+            if norm(Xnpred(:,i)-Xnjaune(:,j))<minDist
+                minDist=norm(Xnpred(:,i)-Xnjaune(:,j));
+                source=Xnjaune(:,j);
+            end
+        end
+        for j=1:N
+            if norm(Xnpred(:,i)-Xnrouge(:,j))<minDist
+                minDist=norm(Xnpred(:,i)-Xnrouge(:,j));
+                source=Xnrouge(:,j);
+            end
+        end
+
+        Vexpecpred(:,i)=Vexpected_source(i,Xnpred,source,Vpred);
     end
 
     %Itération de la méthode d Euler : Une méthode d Euler pour chaque classe d acteur
@@ -257,7 +271,7 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
         plot(Xfin(1), Xfin(2), 'mo', 'MarkerSize', 10, 'MarkerFaceColor', 'm');
         plot(Xn1jaune(1,:),Xn1jaune(2,:),'yo','MarkerSize',5,'MarkerFaceColor','y');
         plot(Xn1rouge(1,:),Xn1rouge(2,:),'ro','MarkerSize',5,'MarkerFaceColor','r');
-        plot(destleader(1), destleader(2), 'wo', 'MarkerSize', 5, 'MarkerFaceColor', 'w');
+        %plot(destleader(1), destleader(2), 'wo', 'MarkerSize', 5, 'MarkerFaceColor', 'w');
         plot(Xn1pred(1,:),Xn1pred(2,:),'bo','MarkerSize',5,'MarkerFaceColor','b');
         txt=['Count = ',num2str(cont)];
         text(a/2,b+b/20,txt,'Fontsize',12);
@@ -278,3 +292,35 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
     cont=cont+1;
     
 end
+figure(1)
+clf();
+hold on;
+% Afficher le rectangle bleu
+rectangle('Position', [0, 0, a, b], 'FaceColor', 'b');
+% Afficher le disque jaune au milieu
+fill(Bordure_ile_x, Bordure_ile_y, 'g');
+
+% Afficher arbres
+for k=2:NbrDisque
+    fill(XDisques(1,k)+RDisques(k)*cos(theta),XDisques(2,k)+RDisques(k)*sin(theta), 'ko','MarkerFaceColor','k'); 
+end
+plot(Xfin(1), Xfin(2), 'mo', 'MarkerSize', 10, 'MarkerFaceColor', 'm');
+plot(Xn1jaune(1,:),Xn1jaune(2,:),'yo','MarkerSize',5,'MarkerFaceColor','y');
+plot(Xn1rouge(1,:),Xn1rouge(2,:),'ro','MarkerSize',5,'MarkerFaceColor','r');
+%plot(destleader(1), destleader(2), 'wo', 'MarkerSize', 5, 'MarkerFaceColor', 'w');
+plot(Xn1pred(1,:),Xn1pred(2,:),'bo','MarkerSize',5,'MarkerFaceColor','b');
+if(condition_arret(Xfin, Xnjaune, Xnrouge, N)==0)
+    txt='Match nul !';
+end
+if(condition_arret(Xfin, Xnjaune, Xnrouge, N)==1)
+    txt='Victoire rouge !';
+end
+if(condition_arret(Xfin, Xnjaune, Xnrouge, N)==2)
+    txt='Victoire jaune !';
+end
+text(a/2,b+b/20,txt,'Fontsize',18);
+axis equal;
+xlim([0 a]);
+ylim([0 b]);
+hold off
+drawnow limitrate nocallbacks;
