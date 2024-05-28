@@ -5,7 +5,7 @@ clear all;
 N = 10;
 n = 5;
 
-Vrobot=3;
+Vrobot=10;
 
 % Définition de l ile
 
@@ -13,7 +13,7 @@ R_ile = 200;
 Center_ile = [250; 250];
 R_spawn = R_ile -1;
 R_pred = 50;
-theta_pred = linspace(0, 7*pi/8, n);
+theta_pred = linspace(0, 7*pi/4, n);
 theta = linspace(0, 2*pi, 1000);
 
 % Équipe 1 : rouges
@@ -169,10 +169,11 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
 
         %Vitesse expected du robot i
         if i==Ileader
-            if count%10==0
-                destleader=(randi([125 375],2,1))
+            destleader=0;
+            if mod(cont,100)==0
+                destleader=(randi([125 375],2,1));
             end
-            Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,destleader,Vrobot)
+            Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,destleader,Vrobot);
         else
             source=Xnrouge(:,Ileader);
             Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,source,Vrobot);
@@ -241,9 +242,10 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
         fill(Bordure_ile_x, Bordure_ile_y, 'g');
 
         % Afficher arbres
-        for k=1:NbrDisque
-            fill(XDisques(1,k)+RDisques(k)*cos(theta),XDisques(2,k)+RDisques(k)*sin(theta),'b'); 
+        for k=2:NbrDisque
+            fill(XDisques(1,k)+RDisques(k)*cos(theta),XDisques(2,k)+RDisques(k)*sin(theta),'d'); 
         end
+        plot(Xfin(1), Xfin(2), 'mo', 'MarkerSize', 10, 'MarkerFaceColor', 'm');
         plot(Xn1jaune(1,:),Xn1jaune(2,:),'yo','MarkerSize',5,'MarkerFaceColor','y');
         plot(Xn1rouge(1,:),Xn1rouge(2,:),'ro','MarkerSize',5,'MarkerFaceColor','r');
         plot(Xn1pred(1,:),Xn1pred(2,:),'bo','MarkerSize',5,'MarkerFaceColor','b');
