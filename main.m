@@ -216,7 +216,7 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
         source=[];
         minDist=Inf;
         for j=1:N
-            if norm(Xnpred(:,i)-Xnjaune(:,j))
+            if norm(Xnpred(:,i)-Xnjaune(:))
         %Vexpecpred(:,i)=Vexpected_robots(i,Xnpred,Vnpred,source,Vrobot);
     end
 
