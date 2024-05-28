@@ -156,7 +156,7 @@ while (t<Tfinal)
         %calcul des forces s execant sur robot i
         Force_others1(:,i)=Interaction_robots(i,1,Xnrouge,Xnjaune,Gjaune,Size1,Size2,N,N);
         Force_loc1(:,i)=Force_loc(i,Vnrouge);
-        Force_fuite1(:,i)=Interaction_robot_predateurs(i,Xnrouge,Xnpred,Size1,Size3,n);  
+        Force_fuite1(:,i)=Interaction_robot_predateur(i,Xnrouge,Xnpred,Size1,Size3,n);  
 
         s=zeros(2,1)
         for k=1:NbrDisque
@@ -173,7 +173,7 @@ while (t<Tfinal)
         %calcul des forces s execant sur robot i
         Force_others2(:,i)=Interaction_robots(i,2,Xnrouge,Xnjaune,Gjaune,Size1,Size2,N,N);
         Force_loc2(:,i)=Force_loc(i,Vnjaune);
-        Force_fuite2(:,i)=Interaction_robot_predateurs(i,Xnjaune,Xnpred,Size2,Size3,n);   
+        Force_fuite2(:,i)=Interaction_robot_predateur(i,Xnjaune,Xnpred,Size2,Size3,n);   
         
         s=zeros(2,1)
         for k=1:NbrDisque

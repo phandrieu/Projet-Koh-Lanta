@@ -6,7 +6,7 @@ function F=Interaction_predateurs(I,X,Gmasse,Size,N)
 CO=0.5;
 CG=0.05;
 
-F=[0;0;0];
+F=[0;0];
 
 for j=1:N
     if not(j == I)
