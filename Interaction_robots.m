@@ -3,8 +3,8 @@ function F=Interaction_robots(I,J,X1,X2,Gmasse,Size1,Size2,N1,N2)
 %du groupe
 
 %constantes multiplicatives devant les forces
-CO=0.5;
-CG=0.05;
+CO=50;
+CG=0.25;
 
 F=[0;0];
 
@@ -26,7 +26,7 @@ if J==1
         F= F + CO*normale*(-d^(-2))*exp(-d);
     end
 
-    F=F+ CG*(Gmasse-X1(:,I))/norm(Gmasse-X1(:,I))/N1;
+    %F=F+ CG*(Gmasse-X1(:,I))/norm(Gmasse-X1(:,I))/N1;
 
 else
     for k=1:N2

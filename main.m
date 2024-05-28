@@ -1,4 +1,4 @@
-% Projet Koh Lanta
+%% Projet Koh Lanta
 
 clear all;
 
@@ -11,7 +11,7 @@ R_ile = 200;
 Center_ile = [250; 250];
 R_spawn = R_ile -1;
 R_pred = 50;
-theta_pred = linspace(0, 2*pi, n);
+theta_pred = linspace(0, 7*pi/8, n);
 theta = linspace(0, 2*pi, 1000);
 
 % Équipe 1 : rouges
@@ -32,7 +32,7 @@ Xnrouge(1,:) = Center_ile(1) - R_spawn*cos(theta_init); % Position x fixe à la 
 Xnrouge(2,:) = Center_ile(2) + R_spawn*sin(theta_init); % Répartir le long du rayon
 
 Vmax = 5;
-
+   
 % Équipe 2 : jaunes
 
 Xnjaune = zeros(2,N);     %postion des jaunes au temps n
@@ -126,7 +126,7 @@ Force_fuite2=zeros(2,N);
 
 %position de la fin
 
-Xfin=[randi([200 300],1,1),randi([200 300],1,1)]
+Xfin=[randi([200 300],1,1),randi([200 300],1,1)];
 
 % Initialisation : Positions initiales
 
@@ -143,7 +143,7 @@ Xfin=[randi([200 300],1,1),randi([200 300],1,1)]
 t=0;
 cont=1;
 
-%%%%%%%%%% Boucle en temps %%%%%%%%%%%%%%%
+%% Boucle en temps %%%%%%%%%%%%%%%
 while (t<Tfinal)
    
     % Calcul du centre de masse
@@ -158,7 +158,7 @@ while (t<Tfinal)
         Force_loc1(:,i)=Force_loc(i,Vnrouge);
         Force_fuite1(:,i)=Interaction_robot_predateur(i,Xnrouge,Xnpred,Size1,Size3,n);  
 
-        s=zeros(2,1)
+        s=zeros(2,1);
         for k=1:NbrDisque
             s=s+Interaction_disque(i,Xnrouge,XDisques(:,k),Size1,RDisques(1,k));
         end
@@ -175,7 +175,7 @@ while (t<Tfinal)
         Force_loc2(:,i)=Force_loc(i,Vnjaune);
         Force_fuite2(:,i)=Interaction_robot_predateur(i,Xnjaune,Xnpred,Size2,Size3,n);   
         
-        s=zeros(2,1)
+        s=zeros(2,1);
         for k=1:NbrDisque
             s=s+Interaction_disque(i,Xnjaune,XDisques(:,k),Size2,RDisques(1,k));
         end
@@ -186,10 +186,10 @@ while (t<Tfinal)
 
     for i=1:n
         %calcul des forces s execant sur robot i
-        Force_others3(:,i)=Interaction_predateurs(i,Xnpred,Vnpred,Gpred,Size3,n);
+        Force_others3(:,i)=Interaction_predateurs(i,Xnpred,Gpred,Size3,n);
         Force_loc3(:,i)=Force_loc(i,Vnpred);
 
-        s=zeros(2,1)
+        s=zeros(2,1);
         for k=1:NbrDisque
             s=s+Interaction_disque(i,Xnpred,XDisques(:,k),Size3,RDisques(1,k));
         end
@@ -200,19 +200,22 @@ while (t<Tfinal)
     end
 
     %Itération de la méthode d Euler : Une méthode d Euler pour chaque classe d acteur
-    Vn1rouge=Vnrouge + dt*(Vexpecprouge-Vnrouge)./Relax + dt * (Force_others1 + Force_disque1 + Force_loc1 + Force_fuite1)./Mass1;
-    Vn1jaune=Vnjaune + dt*(Vexpecjaune-Vnjaune)./Relax + dt*(Force_others2 + Force_disque2 + Force_loc2 + Force_fuite2)./Mass2;
-    Vn1pred=Vnpred + dt*(Vexpecpred-Vnpred)./Relax + dt * Force_others./Mass3 + dt*Force_disque./Mass3;
+    Vn1rouge=Vnrouge + dt * (Force_others1 + Force_disque1 + Force_loc1 + Force_fuite1)./Mass1;
+    Vn1jaune=Vnjaune + dt*(Force_others2 + Force_disque2 + Force_loc2 + Force_fuite2)./Mass2;
+    Vn1pred=Vnpred + dt*(Vexpecpred-Vnpred)./Relax3 + dt * Force_others3./Mass3 + dt*Force_disque3./Mass3;
     
     %Encadrement de la vitesse pour garantir la convergence
-    Vn1jaune=min(2*Vmax,Vn1jaune); Vn1jaune=max(-2*Vmax,Vn1jaune);
-    Vn1rouge=min(2*Vmax,Vn1rouge); Vn1rouge=max(-2*Vmax,Vn1rouge);
-    Vn1pred=min(2*Vmax,Vn1pred); Vn1pred=max(-2*Vmax,Vn1pred);
+    Vn1jaune=min(2*Vmax,Vn1jaune); 
+    Vn1jaune=max(-2*Vmax,Vn1jaune);
+    Vn1rouge=min(2*Vmax,Vn1rouge); 
+    Vn1rouge=max(-2*Vmax,Vn1rouge);
+    Vn1pred=min(2*Vmax,Vn1pred); 
+    Vn1pred=max(-2*Vmax,Vn1pred);
   
     %calcul des nouvelles positions
 
     Xn1jaune=Xnjaune + dt*Vn1jaune;
-    Xn1rogue=Xnrouge + dt*Vn1rouge;
+    Xn1rouge=Xnrouge + dt*Vn1rouge;
     Xn1pred=Xnpred + dt*Vn1pred;
     
     % Affichage
@@ -234,8 +237,12 @@ while (t<Tfinal)
         hold off
         drawnow limitrate nocallbacks;
     end 
-    Vn=Vn1;
-    Xn=Xn1;
+    Vnjaune=Vn1jaune;
+    Vnrouge=Vn1rouge;
+    Vnpred=Vn1pred;
+    Xnjaune=Xn1jaune;
+    Xnrouge=Xn1rouge;
+    Xnpred=Xn1pred;
     t=t+dt;
     temps(cont)=t;
     cont=cont+1;
