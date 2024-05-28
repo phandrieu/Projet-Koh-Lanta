@@ -2,6 +2,8 @@
 
 clear all;
 
+clf;
+
 N = 10;
 n = 5;
 
@@ -169,14 +171,15 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
 
         %Vitesse expected du robot i
         if i==Ileader
-            destleader=0;
-            if mod(cont,100)==0
-                destleader=(randi([125 375],2,1));
+            destleader=[250;250];
+            if mod(cont,10)==0
+                %destleader=(randi([125 375],2,1));
+                destleader=[250;250];
             end
             Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,destleader,Vrobot);
         else
             source=Xnrouge(:,Ileader);
-            Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,source,Vrobot);
+            Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,source,1);
         end
     end
 
@@ -212,7 +215,7 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
     end
 
     %Itération de la méthode d Euler : Une méthode d Euler pour chaque classe d acteur
-    Vn1rouge=Vnrouge + dt * (Force_others1 + Force_disque1 + Force_loc1 + Force_fuite1)./Mass1;
+    Vn1rouge=Vnrouge +dt*(Vexpecrouge-Vnrouge)./Relax1+ dt * (Force_others1 + Force_disque1 + Force_fuite1)./Mass1;
     Vn1jaune=Vnjaune + dt*(Force_others2 + Force_disque2 + Force_loc2 + Force_fuite2)./Mass2;
     Vn1pred=Vnpred + dt*(Vexpecpred-Vnpred)./Relax3 + dt * Force_others3./Mass3 + dt*Force_disque3./Mass3;
     

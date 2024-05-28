@@ -1,11 +1,11 @@
 function result = condition_arret(Xsource, Xnjaune, Xnrouge, N)
     result=false;
-    epsilon = 0.5;
+    epsilon = 10;
     for i=1:N
-        if(norm(Xsource'-Xnjaune(:,i))<0.5)
+        if(norm(Xsource'-Xnjaune(:,i))<epsilon)
             result=true;
         end
-        if(norm(Xsource'-Xnrouge(:,i))<0.5)
+        if(norm(Xsource'-Xnrouge(:,i))<epsilon)
             result=true;
         end
     end
