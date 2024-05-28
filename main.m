@@ -87,7 +87,7 @@ Bordure_ile_y = Center_ile(2)+R_ile*sin(theta);
 %Définition obstacles disques
 NbrDisque=5;
 XDisques=[[250;250],[210;270],[180;201],[220;210],[255;200]];
-RDisques=[R_ile,5,5,5,5],;
+RDisques=[R_ile,5,5,5,5];
 
 % Définition du domaine temporel
 
@@ -170,9 +170,9 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
         %Vitesse expected du robot i
         if i==Ileader
             if count%10==0
-                source=(125+randi([125 250],2,1))
+                destleader=(randi([125 375],2,1))
             end
-            Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,source,Vrobot)
+            Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,destleader,Vrobot)
         else
             source=Xnrouge(:,Ileader);
             Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,source,Vrobot);
