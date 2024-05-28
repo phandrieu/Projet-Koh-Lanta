@@ -1,6 +1,6 @@
 function Fiw = Interaction_disque(I,X,Xdisque,Size,Rdisque)
-    A=2000;
-    B=0.05;
+    A=3000;
+    B=0.3;
     if norm(X(:,I)-Xdisque) > Rdisque
         diw=norm(X(:,I)-Xdisque) - Rdisque;
         Niw=(X(:,I)-Xdisque)/norm(X(:,I)-Xdisque);

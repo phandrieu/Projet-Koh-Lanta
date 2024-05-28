@@ -4,10 +4,10 @@ clear all;
 
 clf;
 
-N = 10;
-n = 5;
+N = 30;
+n = 10;
 
-Vrobot=3;
+Vrobot=10;
 
 % Définition de l ile
 
@@ -87,9 +87,9 @@ Bordure_ile_y = Center_ile(2)+R_ile*sin(theta);
 
 
 %Définition obstacles disques
-NbrDisque=5;
-XDisques=[[250;250],[210;270],[180;201],[220;210],[255;200]];
-RDisques=[R_ile,5,5,5,5];
+NbrDisque=8;
+XDisques=[[250;250],randi([200 300], 2, 1), randi([200 300], 2, 1), randi([200 300], 2, 1), randi([200 300], 2, 1), randi([200 300], 2, 1), randi([200 300], 2, 1), randi([200 300], 2, 1)];
+RDisques=[R_ile,3,3,3,3,3,3,3];
 
 % Définition du domaine temporel
 
@@ -105,7 +105,7 @@ Vexpecrouge=zeros(2,N); %vitesses désirées au temps tn
 Vnjaune=zeros(2,N); %vitesses au temps tn
 Vn1jaune=zeros(2,N); %vitesses au temps tn+1
 Vexpecjaune=zeros(2,N); %vitesses désirées au temps tn
-Vnjaune=200*rand(2,1);
+Vnjaune=-200*rand(2,N);
 
 Vnpred=zeros(2,n); %vitesses au temps tn
 Vn1pred=zeros(2,n); %vitesses au temps tn+1
@@ -153,7 +153,7 @@ cont=1;
 
 %% Boucle en temps %%%%%%%%%%%%%%%
 while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
-   
+    
     % Calcul du centre de masse
     Gjaune=sum(Xnjaune')'/N; 
     Grouge=sum(Xnrouge')'/N;
@@ -173,13 +173,13 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
 
         %Vitesse expected du robot i
         if i==Ileader
-            if mod(cont,300)==0
+            if mod(cont,100)==0
                 destleader=(randi([125 375],2,1));
             end
             Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,destleader,Vrobot);
         else
             source=Xnrouge(:,Ileader);
-            Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,source,2);
+            Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,source,Vrobot-1);
         end
     end
 
@@ -211,7 +211,13 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
         Force_disque3(:,i)=s;
         
         %Vitesse expected du robot i
-        %Vexpec(:,i)=Vexpected_robots(i,Xnpred,Vnpred,source,Vrobot);
+
+        %Calcul source/plus proche proie
+        source=[];
+        minDist=Inf;
+        for j=1:N
+            if norm(Xnpred(:,i)-Xnjaune(:,j))
+        %Vexpecpred(:,i)=Vexpected_robots(i,Xnpred,Vnpred,source,Vrobot);
     end
 
     %Itération de la méthode d Euler : Une méthode d Euler pour chaque classe d acteur
@@ -246,7 +252,7 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
         
         % Afficher arbres
         for k=2:NbrDisque
-            fill(XDisques(1,k)+RDisques(k)*cos(theta),XDisques(2,k)+RDisques(k)*sin(theta),'d'); 
+            fill(XDisques(1,k)+RDisques(k)*cos(theta),XDisques(2,k)+RDisques(k)*sin(theta), 'ko','MarkerFaceColor','k'); 
         end
         plot(Xfin(1), Xfin(2), 'mo', 'MarkerSize', 10, 'MarkerFaceColor', 'm');
         plot(Xn1jaune(1,:),Xn1jaune(2,:),'yo','MarkerSize',5,'MarkerFaceColor','y');
