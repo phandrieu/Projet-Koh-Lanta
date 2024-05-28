@@ -85,7 +85,7 @@ Bordure_ile_y = Center_ile(2)+R_ile*sin(theta);
 %Définition obstacles disques
 NbrDisque=3;
 XDisques=[[250;250] [8;2.5] [4;1.5] [6;0.5]];
-RDisques=[1 0.75 0.25];
+RDisques=[R_ile 1 0.75 0.25];
 
 % Définition du domaine temporel
 
