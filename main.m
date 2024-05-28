@@ -170,7 +170,7 @@ while (t<Tfinal && not(condition_arret(Xfin, Xnjaune, Xnrouge, N)))
         %Vitesse expected du robot i
         if i==Ileader
             if count%10==0
-                source=(125+randi([125 250],2,1))*rand(2,1);
+                source=(125+randi([125 250],2,1))
             end
             Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,source,Vrobot)
         else
