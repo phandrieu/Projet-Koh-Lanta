@@ -46,6 +46,6 @@ else
         F= F + CO*normale*(-d^(-2))*exp(-d);
     end
 
-    F=F+ CG*(Gmasse-X2(:,I))/norm(Gmasse-X2(:,I))/N2;
+    %F=F+ CG*(Gmasse-X2(:,I))/norm(Gmasse-X2(:,I))/N2;
 end
 end
