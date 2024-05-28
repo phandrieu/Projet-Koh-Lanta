@@ -12,7 +12,7 @@ if J==1
     for k=1:N1
         if not(k == I)
                 l0=30*(Size1(I)+Size1(k));
-                normale=(X1(:,k)-X1(:,I))/l0;
+                normale=(X1(:,I)-X1(:,k))/l0;
                 d=norm(normale);
             
             F= F + CO*normale*(d^(-3)-d^(-2))*exp(-d);
@@ -20,10 +20,10 @@ if J==1
     end
     for k=1:N2
         l0=10*(Size1(I)+Size2(k));
-        normale=(X1(:,k)-X2(:,I))/l0;
+        normale=(X1(:,I)-X2(:,k))/l0;
         d=norm(normale);
             
-        F= F + CO*normale*(d^(-3)-d^(-2))*exp(-d);
+        F= F + CO*normale*(d^(-3))*exp(-d);
     end
 
     %F=F+ CG*(Gmasse-X1(:,I))/norm(Gmasse-X1(:,I))/N1;
@@ -31,19 +31,19 @@ if J==1
 else
     for k=1:N2
         if not(k == I)
-                l0=30*(Size2(I)+Size2(k));
-                normale=(X2(:,k)-X2(:,I))/l0;
+                l0=20*(Size2(I)+Size2(k));
+                normale=(X2(:,I)-X2(:,k))/l0;
                 d=norm(normale);
             
-            F= F + CO*normale*(-d^(-2))*exp(-d);
+            F= F + CO*normale*(d^(-3))*exp(-d);
         end
     end
     for k=1:N1
         l0=10*(Size2(I)+Size1(k));
-        normale=(X2(:,k)-X1(:,I))/l0;
+        normale=(X2(:,I)-X1(:,k))/l0;
         d=norm(normale);
             
-        F= F + CO*normale*(-d^(-2))*exp(-d);
+        F= F + CO*normale*(d^(-3))*exp(-d);
     end
 
     %F=F+ CG*(Gmasse-X2(:,I))/norm(Gmasse-X2(:,I))/N2;

@@ -88,9 +88,9 @@ Bordure_ile_y = Center_ile(2)+R_ile*sin(theta);
 
 
 %Définition obstacles disques
-NbrDisque=8;
-XDisques=[[250;250],randi([200 300], 2, 1), randi([200 300], 2, 1), randi([200 300], 2, 1), randi([200 300], 2, 1), randi([200 300], 2, 1), randi([200 300], 2, 1), randi([200 300], 2, 1)];
-RDisques=[R_ile,3,3,3,3,3,3,3];
+NbrDisque=6;
+XDisques=[[250;250],[200;280], [200;314], [251;299], [298;284], [331;304]];
+RDisques=[R_ile,3,3,3,3,3];
 
 % Définition du domaine temporel
 
@@ -260,24 +260,28 @@ while (t<Tfinal && condition_arret(Xfin, Xnjaune, Xnrouge, N)==0)
         clf();
         hold on;
         % Afficher le rectangle bleu
-        rectangle('Position', [0, 0, a, b], 'FaceColor', 'b');
+        %rectangle('Position', [0, 0, a, b], 'FaceColor', 'b');
         % Afficher le disque jaune au milieu
-        fill(Bordure_ile_x, Bordure_ile_y, 'g');
+        %fill(Bordure_ile_x, Bordure_ile_y, 'g');
         
         % Afficher arbres
-        for k=2:NbrDisque
-            fill(XDisques(1,k)+RDisques(k)*cos(theta),XDisques(2,k)+RDisques(k)*sin(theta), 'ko','MarkerFaceColor','k'); 
-        end
-        plot(Xfin(1), Xfin(2), 'mo', 'MarkerSize', 10, 'MarkerFaceColor', 'm');
+        %for k=2:NbrDisque
+        %    fill(XDisques(1,k)+RDisques(k)*cos(theta),XDisques(2,k)+RDisques(k)*sin(theta), 'ko','MarkerFaceColor','k'); 
+        %end
+        plot(Xfin(1), Xfin(2), 'co', 'MarkerSize', 10, 'MarkerFaceColor', 'c');
         plot(Xn1jaune(1,:),Xn1jaune(2,:),'yo','MarkerSize',5,'MarkerFaceColor','y');
         plot(Xn1rouge(1,:),Xn1rouge(2,:),'ro','MarkerSize',5,'MarkerFaceColor','r');
+        plot(Xn1rouge(1, Ileader), Xn1rouge(2, Ileader), 'mo', 'MarkerFaceColor', 'm' ,'MarkerSize', 5)
         %plot(destleader(1), destleader(2), 'wo', 'MarkerSize', 5, 'MarkerFaceColor', 'w');
-        plot(Xn1pred(1,:),Xn1pred(2,:),'bo','MarkerSize',5,'MarkerFaceColor','b');
+        plot(Xn1pred(1,:),Xn1pred(2,:),'wo','MarkerSize',5,'MarkerFaceColor','w');
         txt=['Count = ',num2str(cont)];
         text(a/2,b+b/20,txt,'Fontsize',12);
         axis equal;
         xlim([0 a]);
         ylim([0 b]);
+        I = imread('background.png'); 
+        h = image(xlim,ylim,I); 
+        uistack(h,'bottom')
         hold off
         drawnow limitrate nocallbacks;
     end 
@@ -292,35 +296,40 @@ while (t<Tfinal && condition_arret(Xfin, Xnjaune, Xnrouge, N)==0)
     cont=cont+1;
     
 end
-figure(1)
-clf();
-hold on;
-% Afficher le rectangle bleu
-rectangle('Position', [0, 0, a, b], 'FaceColor', 'b');
-% Afficher le disque jaune au milieu
-fill(Bordure_ile_x, Bordure_ile_y, 'g');
 
-% Afficher arbres
-for k=2:NbrDisque
-    fill(XDisques(1,k)+RDisques(k)*cos(theta),XDisques(2,k)+RDisques(k)*sin(theta), 'ko','MarkerFaceColor','k'); 
-end
-plot(Xfin(1), Xfin(2), 'mo', 'MarkerSize', 10, 'MarkerFaceColor', 'm');
-plot(Xn1jaune(1,:),Xn1jaune(2,:),'yo','MarkerSize',5,'MarkerFaceColor','y');
-plot(Xn1rouge(1,:),Xn1rouge(2,:),'ro','MarkerSize',5,'MarkerFaceColor','r');
-%plot(destleader(1), destleader(2), 'wo', 'MarkerSize', 5, 'MarkerFaceColor', 'w');
-plot(Xn1pred(1,:),Xn1pred(2,:),'bo','MarkerSize',5,'MarkerFaceColor','b');
-if(condition_arret(Xfin, Xnjaune, Xnrouge, N)==0)
+figure(1)
+        clf();
+        hold on;
+        % Afficher le rectangle bleu
+        %rectangle('Position', [0, 0, a, b], 'FaceColor', 'b');
+        % Afficher le disque jaune au milieu
+        %fill(Bordure_ile_x, Bordure_ile_y, 'g');
+        
+        % Afficher arbres
+        %for k=2:NbrDisque
+        %    fill(XDisques(1,k)+RDisques(k)*cos(theta),XDisques(2,k)+RDisques(k)*sin(theta), 'ko','MarkerFaceColor','k'); 
+        %end
+        plot(Xfin(1), Xfin(2), 'co', 'MarkerSize', 10, 'MarkerFaceColor', 'c');
+        plot(Xn1jaune(1,:),Xn1jaune(2,:),'yo','MarkerSize',5,'MarkerFaceColor','y');
+        plot(Xn1rouge(1,:),Xn1rouge(2,:),'ro','MarkerSize',5,'MarkerFaceColor','r');
+        plot(Xn1rouge(1, Ileader), Xn1rouge(2, Ileader), 'mo', 'MarkerFaceColor', 'm' ,'MarkerSize', 5)
+        %plot(destleader(1), destleader(2), 'wo', 'MarkerSize', 5, 'MarkerFaceColor', 'w');
+        plot(Xn1pred(1,:),Xn1pred(2,:),'wo','MarkerSize',5,'MarkerFaceColor','w');
+        if(condition_arret(Xfin, Xnjaune, Xnrouge, N)==0)
     txt='Match nul !';
 end
 if(condition_arret(Xfin, Xnjaune, Xnrouge, N)==1)
-    txt='Victoire rouge !';
+    txt="Victoire de l'équipe rouge !";
 end
 if(condition_arret(Xfin, Xnjaune, Xnrouge, N)==2)
-    txt='Victoire jaune !';
+    txt="Victoire de l'équipe jaune !";
 end
 text(a/2,b+b/20,txt,'Fontsize',18);
-axis equal;
-xlim([0 a]);
-ylim([0 b]);
-hold off
-drawnow limitrate nocallbacks;
+        axis equal;
+        xlim([0 a]);
+        ylim([0 b]);
+        I = imread('background.png'); 
+        h = image(xlim,ylim,I); 
+        uistack(h,'bottom')
+        hold off
+        drawnow limitrate nocallbacks;
