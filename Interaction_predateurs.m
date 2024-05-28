@@ -1,4 +1,4 @@
-function F=Interaction_predateurs(I,X,V,Gmasse,Size,N)
+function F=Interaction_predateurs(I,X,Gmasse,Size,N)
 %calcul de la force qui s'exerce sur l'individu I de la part des autres et
 %du groupe
 

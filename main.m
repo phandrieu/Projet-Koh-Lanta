@@ -83,9 +83,9 @@ Bordure_ile_y = Center_ile(2)+R_ile*sin(theta);
 
 
 %Définition obstacles disques
-NbrDisque=3;
-XDisques=[[250;250] [8;2.5] [4;1.5] [6;0.5]];
-RDisques=[R_ile 1 0.75 0.25];
+NbrDisque=1;
+XDisques=[[250;250]];
+RDisques=[R_ile];
 
 % Définition du domaine temporel
 
@@ -94,13 +94,13 @@ dt = 0.05;
 
 % Vitesses
 
-Vnjaune=zeros(2,N); %vitesses au temps tn
-Vn1jaune=zeros(2,N); %vitesses au temps tn+1
-Vexpecjaune=zeros(2,N); %vitesses désirées au temps tn
-
 Vnrouge=zeros(2,N); %vitesses au temps tn
 Vn1rouge=zeros(2,N); %vitesses au temps tn+1
 Vexpecrouge=zeros(2,N); %vitesses désirées au temps tn
+
+Vnjaune=zeros(2,N); %vitesses au temps tn
+Vn1jaune=zeros(2,N); %vitesses au temps tn+1
+Vexpecjaune=zeros(2,N); %vitesses désirées au temps tn
 
 Vnpred=zeros(2,n); %vitesses au temps tn
 Vn1pred=zeros(2,n); %vitesses au temps tn+1
@@ -131,13 +131,7 @@ Xfin=[randi([200 300],1,1),randi([200 300],1,1)]
 % Initialisation : Positions initiales
 
 %while min(dist)<5
- 
-%A MODIFIER
-%for i=1:N
-%    for k=1:NbrDisque
-%        s=s+Interaction_disque(i,Xn,XDisques(:,k),Size,RDisques(1,k));
-%    end
-%    Force_obstacle(:,i)=s;
+
 
     
 %for i in (1,10)
@@ -161,31 +155,48 @@ while (t<Tfinal)
     for i=1:N
         %calcul des forces s execant sur robot i
         Force_others1(:,i)=Interaction_robots(i,1,Xnrouge,Xnjaune,Gjaune,Size1,Size2,N,N);
-        Force_disque1(:,i)=Interaction_disque(1000, Size, i, Xn, 0.05);
+        Force_loc1(:,i)=Force_loc(i,Vnrouge);
+        Force_fuite1(:,i)=Interaction_robot_predateurs(i,Xnrouge,Xnpred,Size1,Size3,n);  
+
+        s=zeros(2,1)
+        for k=1:NbrDisque
+            s=s+Interaction_disque(i,Xnrouge,XDisques(:,k),Size1,RDisques(1,k));
+        end
+        Force_disque1(:,i)=s;
 
         %Vitesse expected du robot i
-        Vexpec(:,i)=Vexpected_robots(i,Xn,Vn,source,Vrobot);
+        %Vexpec(:,i)=Vexpected_robots(i,Xnrouge,Vnrouge,source,Vrobot);
     end
 
     %%%%%%%%%% Calcul forces interaction Jaune %%%%%%%%%%
     for i=1:N
         %calcul des forces s execant sur robot i
         Force_others2(:,i)=Interaction_robots(i,2,Xnrouge,Xnjaune,Gjaune,Size1,Size2,N,N);
-        Force_disque2(:,i)=Interaction_disque(1000, Size, i, Xn, 0.05);
         Force_loc2(:,i)=Force_loc(i,Vnjaune);
         Force_fuite2(:,i)=Interaction_robot_predateurs(i,Xnjaune,Xnpred,Size2,Size3,n);   
         
+        s=zeros(2,1)
+        for k=1:NbrDisque
+            s=s+Interaction_disque(i,Xnjaune,XDisques(:,k),Size2,RDisques(1,k));
+        end
+        Force_disque2(:,i)=s;
     end
 
     %%%%%%%%%% Calcul forces interaction Predateurs %%%%%%%%%%
 
     for i=1:n
         %calcul des forces s execant sur robot i
-        Force_others(:,i)=Interaction_robots(i,Xn,Vn,G,Size,N);
-        Force_disque(:,i)=Interaction_disque(1000, Size, i, Xn, 0.05);
+        Force_others3(:,i)=Interaction_predateurs(i,Xnpred,Vnpred,Gpred,Size3,n);
+
+        s=zeros(2,1)
+        for k=1:NbrDisque
+            s=s+Interaction_disque(i,Xnpred,XDisques(:,k),Size3,RDisques(1,k));
+        end
+        Force_disque3(:,i)=s;
         
+
         %Vitesse expected du robot i
-        Vexpec(:,i)=Vexpected_robots(i,Xn,Vn,source,Vrobot);
+        Vexpec(:,i)=Vexpected_robots(i,Xnpred,Vnpred,source,Vrobot);
     end
 
     %Itération de la méthode d Euler : Une méthode d Euler pour chaque classe d acteur
