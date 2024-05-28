@@ -187,6 +187,7 @@ while (t<Tfinal)
     for i=1:n
         %calcul des forces s execant sur robot i
         Force_others3(:,i)=Interaction_predateurs(i,Xnpred,Vnpred,Gpred,Size3,n);
+        Force_loc3(:,i)=Force_loc(i,Vnpred);
 
         s=zeros(2,1)
         for k=1:NbrDisque
@@ -194,15 +195,14 @@ while (t<Tfinal)
         end
         Force_disque3(:,i)=s;
         
-
         %Vitesse expected du robot i
-        Vexpec(:,i)=Vexpected_robots(i,Xnpred,Vnpred,source,Vrobot);
+        %Vexpec(:,i)=Vexpected_robots(i,Xnpred,Vnpred,source,Vrobot);
     end
 
     %Itération de la méthode d Euler : Une méthode d Euler pour chaque classe d acteur
-    Vn1rouge=Vnrouge + dt*(Vexpecprouge-Vnrouge)./Relax + dt * (Force_others1 + Force_disque1 + Force_loc1 + Force_fuite1)./Mass;
-    Vn1jaune=Vnjaune + dt*(Vexpecjaune-Vnjaune)./Relax + dt*(Force_others2 + Force_disque2 + Force_loc2 + Force_fuite2)./Mass;
-    Vn1pred=Vnpred + dt*(Vexpecpred-Vnpred)./Relax + dt * Force_others./Mass + dt*Force_disque./Mass;
+    Vn1rouge=Vnrouge + dt*(Vexpecprouge-Vnrouge)./Relax + dt * (Force_others1 + Force_disque1 + Force_loc1 + Force_fuite1)./Mass1;
+    Vn1jaune=Vnjaune + dt*(Vexpecjaune-Vnjaune)./Relax + dt*(Force_others2 + Force_disque2 + Force_loc2 + Force_fuite2)./Mass2;
+    Vn1pred=Vnpred + dt*(Vexpecpred-Vnpred)./Relax + dt * Force_others./Mass3 + dt*Force_disque./Mass3;
     
     %Encadrement de la vitesse pour garantir la convergence
     Vn1jaune=min(2*Vmax,Vn1jaune); Vn1jaune=max(-2*Vmax,Vn1jaune);
@@ -227,7 +227,7 @@ while (t<Tfinal)
         fill(Bordure_ile_x, Bordure_ile_y, 'g');
         plot(Xn1jaune(1,:),Xn1jaune(2,:),'yo','MarkerSize',5,'MarkerFaceColor','y');
         plot(Xn1rouge(1,:),Xn1rouge(2,:),'ro','MarkerSize',5,'MarkerFaceColor','r');
-
+        plot(Xn1pred(1,:),Xn1pred(2,:),'bo','MarkerSize',5,'MarkerFaceColor','b');
         axis equal;
         xlim([0 a]);
         ylim([0 b]);
