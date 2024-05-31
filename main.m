@@ -4,7 +4,7 @@ clear all;
 
 clf;
 
-N = 30;
+N = 20;
 n = 10;
 
 Vrobot=10;
@@ -18,6 +18,12 @@ R_spawn = R_ile -10;
 R_pred = 50;
 theta_pred = linspace(0, 7*pi/4, n);
 theta = linspace(0, 2*pi, 1000);
+
+% Position de Denis
+Xdenis=[250;60];
+Edenis=0; %Equipe qui trouve Denis
+Idenis=0; %Joueur qui trouve Denis
+ecart=30;
 
 % Équipe 1 : rouges
 
@@ -36,7 +42,7 @@ theta_init = linspace(-pi/6, pi/6, N);
 Xnrouge(1,:) = Center_ile(1) - R_spawn*cos(theta_init); % Position x fixe à la bordure gauche
 Xnrouge(2,:) = Center_ile(2) + R_spawn*sin(theta_init); % Répartir le long du rayon
 
-Vmax = 5;
+Vmax = 15;
    
 % Équipe 2 : jaunes
 
@@ -107,7 +113,8 @@ Vnjaune=zeros(2,N); %vitesses au temps tn
 Vn1jaune=zeros(2,N); %vitesses au temps tn+1
 Vexpecjaune=zeros(2,N); %vitesses désirées au temps tn
 
-Vnjaune=(-1)*randi([1,250],2,N);
+% Vnjaune=(-1)*randi([1,250],2,N)
+Vnjaune=randn(2,N);
 
 Vnpred=zeros(2,n); %vitesses au temps tn
 Vn1pred=zeros(2,n); %vitesses au temps tn+1
@@ -131,6 +138,29 @@ Force_loc3=zeros(2,n);
 Force_fuite1=zeros(2,N);
 Force_fuite2=zeros(2,N);
 destleader=[250;250];
+
+
+% Initialisation des images
+BG = imread('background2.png');
+[imgJaune, ~, alphaJaune] = imread('JJaune.png');
+[imgRouge, ~, alphaRouge] = imread('JRouge.png');
+[imgDenis, ~, alphaDenis] = imread('Denis.png');
+[imgPred, ~, alphaPred] = imread('Pred.png');
+
+scaleFactor = 0.1;  % Facteur de réduction
+imgJaune = imresize(imgJaune, scaleFactor);
+alphaJaune = imresize(alphaJaune, scaleFactor);
+
+imgRouge = imresize(imgRouge, scaleFactor);
+alphaRouge = imresize(alphaRouge, scaleFactor);
+
+imgDenis = imresize(imgDenis, scaleFactor);
+alphaDenis = imresize(alphaDenis, scaleFactor);
+
+scaleFactor= 0.02;
+imgPred = imresize(imgPred, scaleFactor);
+alphaPred = imresize(alphaPred, scaleFactor);
+
 
 %position de la fin
 
@@ -172,16 +202,25 @@ while (t<Tfinal && condition_arret(Xfin, Xnjaune, Xnrouge, N)==0)
             s=s+Interaction_disque(i,Xnrouge,XDisques(:,k),Size1,RDisques(1,k));
         end
         Force_disque1(:,i)=s;
+        
+        if norm(Xnrouge(:,i)-Xdenis)<ecart && Edenis==0
+            Edenis=1;
+            Idenis=i;
+        end
 
-        %Vitesse expected du robot i
-        if i==Ileader
-            if mod(cont,100)==0
-                destleader=(randi([125 375],2,1));
-            end
-            Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,destleader,Vrobot);
+        if Edenis==1 && Idenis==i
+            Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,Xfin',Vrobot);
         else
-            source=Xnrouge(:,Ileader);
-            Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,source,Vrobot-1);
+        %Vitesse expected du robot i
+            if i==Ileader
+                if mod(cont,100)==0
+                    destleader=(randi([125 375],2,1));
+                end
+                Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,destleader,Vrobot+1);
+            else
+                source=Xnrouge(:,Ileader);
+                Vexpecrouge(:,i)=Vexpected_source(i,Xnrouge,source,Vrobot);
+            end
         end
     end
 
@@ -189,7 +228,6 @@ while (t<Tfinal && condition_arret(Xfin, Xnjaune, Xnrouge, N)==0)
     for i=1:N
         %calcul des forces s execant sur robot i
         Force_others2(:,i)=Interaction_robots(i,2,Xnrouge,Xnjaune,Gjaune,Size1,Size2,N,N);
-        Force_loc2(:,i)=Force_loc(i,Vnjaune);
         Force_fuite2(:,i)=Interaction_robot_predateur(i,Xnjaune,Xnpred,Size2,Size3,n);   
         
         s=zeros(2,1);
@@ -197,6 +235,15 @@ while (t<Tfinal && condition_arret(Xfin, Xnjaune, Xnrouge, N)==0)
             s=s+Interaction_disque(i,Xnjaune,XDisques(:,k),Size2,RDisques(1,k));
         end
         Force_disque2(:,i)=s;
+
+        if norm(Xnjaune(:,i)-Xdenis)<ecart && Edenis==0
+            Edenis=2;
+            Idenis=i;
+        end
+        if Edenis==2 && Idenis==i
+            Vnjaune(:,i)=norm(Vnjaune(:,i))*((Xfin'-Xnjaune(:,i))/norm(Xfin'-Xnjaune(:,i)));
+        end
+        Force_loc2(:,i)=Force_loc(i,Vnjaune);
     end
 
     %%%%%%%%%% Calcul forces interaction Predateurs %%%%%%%%%%
@@ -252,6 +299,14 @@ while (t<Tfinal && condition_arret(Xfin, Xnjaune, Xnrouge, N)==0)
     Xn1jaune=Xnjaune + dt*Vn1jaune;
     Xn1rouge=Xnrouge + dt*Vn1rouge;
     Xn1pred=Xnpred + dt*Vn1pred;
+
+    % Calculs des vitesses moyennes
+    for i=1:N
+        VmoyVectnrouge(1,i) = norm(Vnrouge(:,i));
+        VmoyVectnjaune(1,i) = norm(Vnjaune(:,i));
+    end
+    Vmoynrouge(cont) = mean(VmoyVectnrouge,2);
+    Vmoynjaune(cont) = mean(VmoyVectnjaune,2);
     
     % Affichage
     nbiter=2;
@@ -265,26 +320,51 @@ while (t<Tfinal && condition_arret(Xfin, Xnjaune, Xnrouge, N)==0)
         %fill(Bordure_ile_x, Bordure_ile_y, 'g');
         
         % Afficher arbres
-        %for k=2:NbrDisque
-        %    fill(XDisques(1,k)+RDisques(k)*cos(theta),XDisques(2,k)+RDisques(k)*sin(theta), 'ko','MarkerFaceColor','k'); 
-        %end
+        for k=2:NbrDisque
+           fill(XDisques(1,k)+RDisques(k)*cos(theta),XDisques(2,k)+RDisques(k)*sin(theta), 'ko','MarkerFaceColor','k'); 
+        end
         plot(Xfin(1), Xfin(2), 'co', 'MarkerSize', 10, 'MarkerFaceColor', 'c');
-        plot(Xn1jaune(1,:),Xn1jaune(2,:),'yo','MarkerSize',5,'MarkerFaceColor','y');
-        plot(Xn1rouge(1,:),Xn1rouge(2,:),'ro','MarkerSize',5,'MarkerFaceColor','r');
-        plot(Xn1rouge(1, Ileader), Xn1rouge(2, Ileader), 'mo', 'MarkerFaceColor', 'm' ,'MarkerSize', 5)
+        %plot(Xn1jaune(1,:),Xn1jaune(2,:),'yo','MarkerSize',5,'MarkerFaceColor','y');
+        %plot(Xn1rouge(1,:),Xn1rouge(2,:),'ro','MarkerSize',5,'MarkerFaceColor','r');
+        %plot(Xn1rouge(1, Ileader), Xn1rouge(2, Ileader), 'mo', 'MarkerFaceColor', 'm' ,'MarkerSize', 5)
         %plot(destleader(1), destleader(2), 'wo', 'MarkerSize', 5, 'MarkerFaceColor', 'w');
-        plot(Xn1pred(1,:),Xn1pred(2,:),'wo','MarkerSize',5,'MarkerFaceColor','w');
+        %plot(Xn1pred(1,:),Xn1pred(2,:),'wo','MarkerSize',5,'MarkerFaceColor','w');
+
+        
+        % Placer les images aux emplacements des points
+        [imgHeightRouge, imgWidthRouge, ~] = size(imgRouge);
+        [imgHeightJaune, imgWidthJaune, ~] = size(imgJaune);
+        [imgHeightPred, imgWidthPred, ~] = size(imgPred);
+        for i = 1:N
+            if i<=n  % ok car N>n
+                posXPred=Xn1pred(1,i) - imgWidthPred / 2;
+                posYPred = Xn1pred(2,i) - imgHeightPred / 2;
+                image('CData', imgPred, 'XData', [posXPred, posXPred + imgWidthPred], 'YData', [posYPred, posYPred + imgHeightPred], 'AlphaData', alphaPred);
+            end
+            % Calculer la position de l'image
+            posXRouge = Xn1rouge(1,i) - imgWidthRouge / 2;
+            posYRouge = Xn1rouge(2,i) - imgHeightRouge / 2;
+
+            posXJaune = Xn1jaune(1,i) - imgWidthJaune / 2;
+            posYJaune = Xn1jaune(2,i) - imgHeightJaune / 2;
+            
+            % Afficher l'image en tant que marqueur
+            image('CData', imgRouge, 'XData', [posXRouge, posXRouge + imgWidthRouge], 'YData', [posYRouge, posYRouge + imgHeightRouge], 'AlphaData', alphaRouge);
+            image('CData', imgJaune, 'XData', [posXJaune, posXJaune + imgWidthJaune], 'YData', [posYJaune, posYJaune + imgHeightJaune], 'AlphaData', alphaJaune);
+        end
+
+        
+        image('CData', imgDenis, 'XData', Xdenis(1), 'YData', Xdenis(2), 'AlphaData', alphaDenis);
         txt=['Count = ',num2str(cont)];
         text(a/2,b+b/20,txt,'Fontsize',12);
         axis equal;
         xlim([0 a]);
         ylim([0 b]);
-        I = imread('background.png'); 
-        h = image(xlim,ylim,I); 
+        h = image(xlim,ylim,BG); 
         uistack(h,'bottom')
         hold off
         drawnow limitrate nocallbacks;
-    end 
+    end
     Vnjaune=Vn1jaune;
     Vnrouge=Vn1rouge;
     Vnpred=Vn1pred;
@@ -328,8 +408,16 @@ text(a/2,b+b/20,txt,'Fontsize',18);
         axis equal;
         xlim([0 a]);
         ylim([0 b]);
-        I = imread('background.png'); 
-        h = image(xlim,ylim,I); 
+        h = image(xlim,ylim,BG); 
         uistack(h,'bottom')
         hold off
         drawnow limitrate nocallbacks;
+  
+
+figure(2);
+plot(temps,Vmoynrouge,"Color",'r');
+hold on;
+plot(temps,Vmoynjaune,"Color",'#DEC131');
+xlabel('time sec');
+ylabel('Vitesse moyenne m/sec');
+
